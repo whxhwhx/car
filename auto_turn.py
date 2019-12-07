@@ -226,8 +226,6 @@ def judge(stream):
         current_time = time.time()
         with graph.as_default():
             prediction_array = model.predict(camera_data_array, batch_size=20)
-            # 输出的是概率，比如[0.1,0.1,0.8,0.05,0.04]
-        #print(prediction_array)
         action_num = get_max_prob_num(prediction_array)
         control_car(action_num)
     finally:
@@ -301,7 +299,7 @@ def main():
     camera = picamera.PiCamera(resolution=(160, 120))
     camera.brightness = 60 
 
-    ser = serial.Serial("/dev/ttyAMA0", 115200, timeout=0.5)  # 打开端口，改到循环外
+    ser = serial.Serial("/dev/ttyAMA0", 115200, timeout=0.5)  
 
     dis_thread1 = threading.Thread(target=hc_1, args=())
     dis_thread1.setDaemon(True)
@@ -328,13 +326,13 @@ def main():
                     car_control.slow_backward()
                 car_control.car_stop()
                 time.sleep(0.1)
-                #smart_go_right()
-                #smart_go_left()
                 event1.clear()
+
                 flag += 1
                 if flag == 3:
                     time.sleep(3)
                     print('stop')
+
                 camera.capture(stream, format='jpeg')
                 judge(stream)
                 distance_cm = 40

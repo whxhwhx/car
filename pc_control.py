@@ -1,12 +1,9 @@
-# 收集数据，赛道照片和对应的前、后、左、右、4停 # 对应图片和相应的标签值
-import io
 import w4_car_control 
 import os
 os.environ['SDL_VIDEODRIVE'] = 'x11'
-import pygame     # 检测模块
+import pygame    
 from time import ctime,sleep,time
 import threading
-import numpy as np
 
 is_capture_running = True
 
@@ -19,8 +16,6 @@ def my_car_control():
     print("Start control!")
  
     while is_capture_running:
-        # get input from human driver
-        # 
         for event in pygame.event.get():
             # 判断事件是不是按键按下的事件
             if event.type == pygame.KEYDOWN:  
@@ -66,11 +61,9 @@ def my_car_control():
                     print("cycle left")
                     w4_car_control.car_cycle_left()
                     sleep(0.1)
-                # 按下k停止键，停止
                 elif key_input[pygame.K_k]:
                     w4_car_control.car_stop()
                     is_capture_running = False 
-            # 检测按键是不是抬起
             elif event.type == pygame.KEYUP:
                 #key_input = pygame.key.get_pressed()
                 print("Stop")
