@@ -1,9 +1,11 @@
 import time
+import threading
 import car_control
 import RPi.GPIO as GPIO
  
-trigger_pin = 7 
-echo_pin = 22 
+trigger_pin = 36 
+echo_pin = 33 
+distance_cm = 0 
  
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(trigger_pin,GPIO.OUT)
@@ -15,7 +17,6 @@ def wait_for_echo(value,timeout):
         count = count-1
  
 def get_distance():
-
     GPIO.output(trigger_pin,True)
     time.sleep(0.00015)
     GPIO.output(trigger_pin,False)
@@ -29,9 +30,10 @@ def get_distance():
     return distance_cm
 
 def main():
+    global distance_cm
     try:
         while True:
-            print("距离 = %f cm"%get_distance())
+            print(get_distance())
             time.sleep(0.1)
     except:
         GPIO.cleanup()

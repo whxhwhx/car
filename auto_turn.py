@@ -2,15 +2,15 @@ import threading
 import io
 import time
 import RPi.GPIO as GPIO
-import w4_car_control
+import car_control
 import picamera
 import glob
 import serial
-#from keras.models import load_model
-#import tensorflow as tf
-#from PIL import Image
-#import picamera.array
-#import numpy as np
+from keras.models import load_model
+import tensorflow as tf
+from PIL import Image
+import picamera.array
+import numpy as np
 
 # serial 
 ACCData=[0.0]*8
@@ -22,10 +22,12 @@ Bytenum = 0               #读取到这一段的第几位
 CheckSum = 0              #求和校验位         
 angle = []
 dire_angle=0.0
+distance_cm = 50
+flag = 0
 
 #hc_sr04
-trigger_pin3 = 7 
-echo_pin3 = 22 
+trigger_pin3 = 36 
+echo_pin3 = 33 
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(trigger_pin3,GPIO.OUT)
@@ -184,7 +186,7 @@ def get_distance(trigger_pin, echo_pin):
     finish = time.time()
     pulse_len = finish-start
     distance_cm = pulse_len/0.000058
-    time.sleep(0.01)
+    time.sleep(0.05)
 
 def hc_1():
     while True:
@@ -204,27 +206,15 @@ def get_max_prob_num(predictions_array):
 def control_car(action_num):
     global distance_cm
     if action_num == 0:
-        event1.clear()
-        time.sleep(0.2)
-        w4_car_control.car_go_left()
-        time.sleep(0.5)
-        w4_car_control.car_stop()
-        distance_cm = 50
-        event1.set()
+        print('left')
+        smart_go_left()
     elif action_num == 1:
-        event1.clear()
-        time.sleep(0.2)
-        w4_car_control.car_go_right()
-        time.sleep(0.5)
-        w4_car_control.car_stop()
-        distance_cm = 50
-        event1.set()
+        print('right')
+        smart_go_right()
     elif action_num == 2:
-        w4_car_control.car_stop()
-        time.sleep(1)
-    else:
-        w4_car_control.car_move_backward()
-        #w4_car_control.car_stop()
+        print('bibi')
+        car_control.car_stop()
+        time.sleep(2)
 
 def judge(stream):
     global model, graph
@@ -247,62 +237,69 @@ def judge(stream):
 def smart_forward():
     global angle,dire_angle
     now_angle = angle[2]
-    if abs(abs(now_angle)-abs(dire_angle))<1.8:
-        w4_car_control.car_move_forward()
+    if abs(abs(now_angle)-abs(dire_angle))<=2:
+        car_control.car_move_forward()
         time.sleep(0.1)
     elif dire_angle == 180 or dire_angle== -180:
         if now_angle>0:
-            w4_car_control.adapt_left()
+            car_control.adapt_left()
         else:
-            w4_car_control.adapt_right()
+            car_control.adapt_right()
     else:
         if now_angle<dire_angle:
-            w4_car_control.adapt_left()
+            car_control.adapt_left()
         else:
-            w4_car_control.adapt_right()
+            car_control.adapt_right()
 
 
 def smart_go_right():
     global dire_angle,distance_cm,event1
-    event1.clear()
     dire_angle = dire_angle-90 
     if dire_angle == -270.0:
         dire_angle = 90.0
     while abs(angle[2]-dire_angle) > 18:   
-        w4_car_control.car_cycle_right()
-    w4_car_control.car_cycle_left()
+        car_control.car_cycle_right()
+    car_control.car_cycle_left()
     time.sleep(0.05)
-    w4_car_control.car_stop()
+    car_control.car_stop()
     distance_cm = 40
-    event1.set()
+
+def smart_go_back():
+    global dire_angle,distance_cm,event1
+    dire_angle = 180 
+    while abs(angle[2]-dire_angle) > 18:   
+        car_control.car_cycle_right()
+    car_control.car_cycle_left()
+    time.sleep(0.05)
+    car_control.car_stop()
+    distance_cm = 40
+
 
 def smart_go_left():
     global dire_angle,distance_cm,event1
-    event1.clear()
     dire_angle = dire_angle+90 
     if dire_angle == 270.0:
         dire_angle = -90.0
-    while abs(angle[2]-dire_angle) > 18:   
-        w4_car_control.car_cycle_left()
-    w4_car_control.car_cycle_right()
+    while abs(angle[2]-dire_angle) > 15:   
+        car_control.car_cycle_left()
+    car_control.car_cycle_right()
     time.sleep(0.05)
-    w4_car_control.car_stop()
+    car_control.car_stop()
     distance_cm = 40
-    event1.set()
 
 def main():
-    global ser ,distance_cm, model, graph, angle
+    global flag,ser ,distance_cm, model, graph, angle
     stream = io.BytesIO()
 
-    #model_loaded = glob.glob('model/*.h5') 
-    #for single_mod in model_loaded:
-    #    model = load_model(single_mod)
-    #graph = tf.get_default_graph()
+    model_loaded = glob.glob('model/*.h5') 
+    for single_mod in model_loaded:
+        model = load_model(single_mod)
+    graph = tf.get_default_graph()
     print('ok')
 
     # open camera
-    #camera = picamera.PiCamera(resolution=(160, 120))
-    #camera.brightness = 72
+    camera = picamera.PiCamera(resolution=(160, 120))
+    camera.brightness = 60 
 
     ser = serial.Serial("/dev/ttyAMA0", 115200, timeout=0.5)  # 打开端口，改到循环外
 
@@ -318,30 +315,36 @@ def main():
     print('set')
     event1.set()
 
-    time.sleep(2)
+    time.sleep(3)
     print(angle[2])
 
     try:
         while True:
-            if distance_cm<20:
-                w4_car_control.car_move_backward()
-                time.sleep(0.2)
-                w4_car_control.car_stop()
-                time.sleep(0.2)
-                while distance_cm<14:
-                    w4_car_control.car_move_backward()
-                w4_car_control.car_move_forward()
+            print(distance_cm)
+            if distance_cm<27 and distance_cm>2:
+                car_control.car_stop()
+                time.sleep(0.5)
+                while distance_cm<13 or distance_cm >100:
+                    car_control.slow_backward()
+                car_control.car_stop()
                 time.sleep(0.1)
-                w4_car_control.car_stop()
-                time.sleep(0.1)
-                #camera.capture(stream, format='jpeg')
-                #judge(stream)
-                smart_go_right()
+                #smart_go_right()
+                #smart_go_left()
+                event1.clear()
+                flag += 1
+                if flag == 3:
+                    time.sleep(3)
+                    print('stop')
+                camera.capture(stream, format='jpeg')
+                judge(stream)
+                distance_cm = 40
+                event1.set()
             else:
                 smart_forward()
     finally:
-        #camera.close()
+        camera.close()
         GPIO.cleanup()
+        stream.close()
 
 if __name__ == '__main__':
     main()

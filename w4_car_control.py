@@ -57,10 +57,10 @@ def car_move_forward():
     GPIO.output(back_right_input1,GPIO.HIGH)
     GPIO.output(back_right_input2,GPIO.LOW)
 
-    front_rightPwm.ChangeDutyCycle(25)         # 改变PWM占空比，参数为占空比
-    front_leftPwm.ChangeDutyCycle(25)         # 改变PWM占空比，参数为占空比
-    back_leftPwm.ChangeDutyCycle(25)         # 改变PWM占空比，参数为占空比
-    back_rightPwm.ChangeDutyCycle(25)         # 改变PWM占空比，参数为占空比
+    front_rightPwm.ChangeDutyCycle(22)         # 改变PWM占空比，参数为占空比
+    front_leftPwm.ChangeDutyCycle(22)         # 改变PWM占空比，参数为占空比
+    back_leftPwm.ChangeDutyCycle(22)         # 改变PWM占空比，参数为占空比
+    back_rightPwm.ChangeDutyCycle(22)         # 改变PWM占空比，参数为占空比
 
 
 def car_move_backward():
@@ -73,10 +73,10 @@ def car_move_backward():
     GPIO.output(back_right_input2,GPIO.HIGH)
     GPIO.output(back_right_input1,GPIO.LOW)
 
-    front_rightPwm.ChangeDutyCycle(24)         # 改变PWM占空比，参数为占空比
-    front_leftPwm.ChangeDutyCycle(24)         # 改变PWM占空比，参数为占空比
-    back_leftPwm.ChangeDutyCycle(24)         # 改变PWM占空比，参数为占空比
-    back_rightPwm.ChangeDutyCycle(24)         # 改变PWM占空比，参数为占空比
+    front_rightPwm.ChangeDutyCycle(20)         # 改变PWM占空比，参数为占空比
+    front_leftPwm.ChangeDutyCycle(20)         # 改变PWM占空比，参数为占空比
+    back_leftPwm.ChangeDutyCycle(20)         # 改变PWM占空比，参数为占空比
+    back_rightPwm.ChangeDutyCycle(20)         # 改变PWM占空比，参数为占空比
     
 
 def car_go_right():
@@ -232,10 +232,10 @@ def adapt_left():
     GPIO.output(back_right_input1,GPIO.HIGH)
     GPIO.output(back_right_input2,GPIO.LOW)
 
-    front_rightPwm.ChangeDutyCycle(25)         # 改变PWM占空比，参数为占空比
-    front_leftPwm.ChangeDutyCycle(13)         # 改变PWM占空比，参数为占空比
-    back_leftPwm.ChangeDutyCycle(13)         # 改变PWM占空比，参数为占空比
-    back_rightPwm.ChangeDutyCycle(25)         # 改变PWM占空比，参数为占空比
+    front_rightPwm.ChangeDutyCycle(22)         # 改变PWM占空比，参数为占空比
+    front_leftPwm.ChangeDutyCycle(10)         # 改变PWM占空比，参数为占空比
+    back_leftPwm.ChangeDutyCycle(10)         # 改变PWM占空比，参数为占空比
+    back_rightPwm.ChangeDutyCycle(22)         # 改变PWM占空比，参数为占空比
 
 def adapt_right():
     GPIO.output(front_left_input1,GPIO.HIGH)
@@ -247,10 +247,10 @@ def adapt_right():
     GPIO.output(back_right_input1,GPIO.HIGH)
     GPIO.output(back_right_input2,GPIO.LOW)
 
-    front_rightPwm.ChangeDutyCycle(13)         # 改变PWM占空比，参数为占空比
-    back_rightPwm.ChangeDutyCycle(13)         # 改变PWM占空比，参数为占空比
-    front_leftPwm.ChangeDutyCycle(25)         # 改变PWM占空比，参数为占空比
-    back_leftPwm.ChangeDutyCycle(25)         # 改变PWM占空比，参数为占空比
+    front_rightPwm.ChangeDutyCycle(10)         # 改变PWM占空比，参数为占空比
+    back_rightPwm.ChangeDutyCycle(10)         # 改变PWM占空比，参数为占空比
+    front_leftPwm.ChangeDutyCycle(22)         # 改变PWM占空比，参数为占空比
+    back_leftPwm.ChangeDutyCycle(22)         # 改变PWM占空比，参数为占空比
 
 
 
